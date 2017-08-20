@@ -38,6 +38,7 @@ struct Flags
 
 const byte ip[4] = { IP };
 const uint8_t mac[6] = { MACADDRESS };
+const char uniq[7] = {MACADDRESS,0};
 const byte server[4] = { SERVER };
 const int qos = QOS;//quality of service of the mqtt subscription
 const int retain = RETAIN;
@@ -46,8 +47,12 @@ const int retain = RETAIN;
 
 Flags flags;
 bool toggleled = false;
+bool toggledoor = false;
 long previousMillis;
 char mqttstring[20];
+byte buzzer = 0;
+unsigned long lastOpenStart = 0;
+unsigned long lastActivate = 0;
 
 EthernetClient ethClient;
 PubSubClient mqttclient(server, 1883, mqtt_callback, ethClient);
@@ -97,8 +102,10 @@ void setup() {
   flags.opendoor = false;
 
   Serial.begin(9600);
+  Serial.println(F("\n\n" __FILE__ " " __DATE__ " " __TIME__));
   SPI.begin();
   mfrc522.PCD_Init();
+
   //mfrc522.PCD_SetAntennaGain(0x07);
   //read and printout the MFRC522 version (valid values 0x91 & 0x92)
   Serial.print(F("MFRC Ver: 0x"));
@@ -121,6 +128,8 @@ void setup() {
   pinMode(BLINKLED, OUTPUT);
   pinMode(RFIDREADLED, OUTPUT);
   pinMode(IRQ_PIN, INPUT_PULLUP);
+  //pinMode(9, OUTPUT);
+  //setPwmFrequency(9, 8);
 
   // Allow the ... irq to be propagated to the IRQ pin
   // For test purposes propagate the IdleIrq and loAlert
@@ -137,23 +146,24 @@ void setup() {
 
 void reconnect() {
   // Loop until we're reconnected
-  while (!mqttclient.connected()) {
-    Serial.print(F("Attempting MQTT connection..."));
-    // Attempt to connect
-    if (mqttclient.connect("ac")) {
-      Serial.println(F("connected"));
-      // Once connected, publish an announcement...
-      //mqttclient.publish("vrdr","hi");
-      // ... and resubscribe
-      mqttclient.subscribe(INTOPIC, qos);
-    } else {
-      Serial.print(F("failed, rc="));
-      Serial.print(mqttclient.state());
-      Serial.println(F(" try again in 5 seconds"));
-      // Wait 5 seconds before retrying
-      delay(5000);
-    }
+  if (mqttclient.connected())
+  return;
+
+  Serial.print(F("Attempting MQTT connection..."));
+  // Attempt to connect
+  if (!mqttclient.connect(uniq)) {
+    Serial.print(F("failed, rc="));
+    Serial.print(mqttclient.state());
+    Serial.println(F(" try again in 5 seconds"));
+    // Wait 5 seconds before retrying
+    delay(5000);
+    return;
   }
+    Serial.println(F("connected"));
+    // Once connected, publish an announcement...
+    //mqttclient.publish("vrdr","hi");
+    // ... and resubscribe
+    mqttclient.subscribe(INTOPIC, qos);
 }
 
 //not sure about the data types here...
@@ -167,7 +177,7 @@ byte copy_to_mqtttag(byte *buffer, byte bufferSize) {
 }
 
 void IRQ_invoked() {
-  digitalWrite(RFIDREADLED, HIGH);
+  //digitalWrite(RFIDREADLED, HIGH);
 
   if (mfrc522.PICC_ReadCardSerial() && mfrc522.uid.size) {
     /* Show some details of the PICC// (that is: the tag/card)
@@ -191,7 +201,7 @@ void IRQ_invoked() {
 #endif
   }
   clearIRQ(mfrc522);
-  //mfrc522.PICC_HaltA();
+  mfrc522.PICC_HaltA();
 }
 
 void loop() {
@@ -206,11 +216,27 @@ void loop() {
   //(tell the tag it should transmit??)
   // (mfrc522.PCD_WriteRegister(mfrc522.FIFODataReg,mfrc522.PICC_CMD_REQA);)
   //
-  unsigned long lastActivate = 0;
-  if (millis() - lastActivate > 5000) {
+
+  if (millis() - lastActivate > 0) {
     activateRec(mfrc522);
     lastActivate = millis();
+
+    //digitalWrite(DOORPIN, toggledoor);
   }
+
+  unsigned long beeper = 0;
+  if (millis() - beeper > 200) {
+    lastActivate = millis();
+    toggledoor = !toggledoor;
+    if (toggledoor)
+    {analogWrite(6, buzzer);}
+    else
+    {analogWrite(6, 00);}
+
+    beeper=millis();
+    //digitalWrite(DOORPIN, toggledoor);
+  }
+
 
   if (!mqttclient.connected()) {
     reconnect();
@@ -224,16 +250,28 @@ void loop() {
     flags.newgoodread = false;
   }
 
-  unsigned long lastOpenStart = 0;
+
   if (flags.opendoor) {
     if (lastOpenStart == 0) {
+
       digitalWrite(DOORPIN, HIGH);
-      lastOpenStart = millis() & 1;
+      #if DEBUG==1
+      Serial.println(F("door pin open"));
+      #endif
+      buzzer = 50;
+      lastOpenStart = millis()|1;
+      Serial.println(lastOpenStart);
+      //Serial.println();
+      //if (!lastOpenStart) lastOpenStart++;
     };
-    if (millis() - lastOpenStart > DOOROPEN) {
+    if (millis() - lastOpenStart > 5000) {
       digitalWrite(DOORPIN, LOW);
+      #if DEBUG==1
+      Serial.println(F("door pin close"));
+      #endif
       //undo_stuff();
       flags.opendoor = false;
+      buzzer = 0;
       lastOpenStart = 0;
     }
   }
