@@ -206,9 +206,9 @@ void loop() {
   // (mfrc522.PCD_WriteRegister(mfrc522.FIFODataReg,mfrc522.PICC_CMD_REQA);)
   //
   unsigned long lastActivate = 0;
-  if (now() - lastActivate > 5000) {
+  if (millis() - lastActivate > 5000) {
     activateRec(mfrc522);
-    lastActivate = now();
+    lastActivate = millis();
   }
 
   if (!mqttclient.connected()) {
@@ -223,13 +223,13 @@ void loop() {
     flags.newgoodread = false;
   }
 
-  unsinged long lastOpenStart = 0;
+  unsigned long lastOpenStart = 0;
   if (flags.opendoor) {
     if (lastOpenStart == 0) {
       digitalWrite(DOORPIN, HIGH);
       lastOpenStart = millis() & 1;
     };
-    if (now() - lastOpenStart > DOOROPEN) {
+    if (millis() - lastOpenStart > DOOROPEN) {
       digitalWrite(DOORPIN, LOW);
       //undo_stuff();
       flags.opendoor = false;
