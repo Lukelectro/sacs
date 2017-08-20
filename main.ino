@@ -1,4 +1,6 @@
 /*
+    main.ino
+ 
     Copyright 2017 marcell marosvolgyi <marcell@stereodyne.com>
 
     This program is free software: you can redistribute it and/or modify
