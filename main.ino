@@ -180,7 +180,7 @@ void IRQ_invoked() {
     byte call = copy_to_mqtttag(mfrc522.uid.uidByte, mfrc522.uid.size);
     //if call!=0 handle it somehow...TODO
     flags.newgoodread = (call == 0);
-
+    mfrc522.uid.size = 0; // we're done with the UID, clear it.y
 #if DEBUG==1
     Serial.print(F("Card UID:"));
     if (flags.newgoodread)
@@ -191,8 +191,7 @@ void IRQ_invoked() {
 #endif
   }
   clearIRQ(mfrc522);
-  mfrc522.uid.size = 0; // we're done with the UID, clear it.
-  mfrc522.PICC_HaltA();
+  //mfrc522.PICC_HaltA();
 }
 
 void loop() {
