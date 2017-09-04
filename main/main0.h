@@ -31,10 +31,10 @@
 
 #define FORMAT "[%d, %d, %d, %d]"
 #ifndef INTOPIC
-#define INTOPIC <deur voor open topic>
+#define INTOPIC "InPutTopic_TEST" 
 #endif
 #ifndef OUTTOPIC
-#define OUTTOPIC <deur voor rfid topic>
+#define OUTTOPIC "OutPutTopic_TEST"
 #endif
 #define DOOROPEN 5000
 #if DOOROPEN>8000
