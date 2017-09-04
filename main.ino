@@ -159,11 +159,11 @@ void reconnect() {
     delay(5000);
     return;
   }
-  Serial.println(F("connected"));
-  // Once connected, publish an announcement...
-  //mqttclient.publish("vrdr","hi");
-  // ... and resubscribe
-  mqttclient.subscribe(INTOPIC, qos);
+    Serial.println(F("connected"));
+    // Once connected, publish an announcement...
+    //mqttclient.publish("vrdr","hi");
+    // ... and resubscribe
+    mqttclient.subscribe(INTOPIC, qos);
 }
 
 //not sure about the data types here...
@@ -264,7 +264,7 @@ void loop() {
       //Serial.println();
       //if (!lastOpenStart) lastOpenStart++;
     };
-    if (millis() - lastOpenStart > DOOROPEN) {
+    if (millis() - lastOpenStart > 5000) {
       digitalWrite(DOORPIN, LOW);
       #if DEBUG==1
       Serial.println(F("door pin close"));
