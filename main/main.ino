@@ -18,7 +18,7 @@
 */
 
 #include <SPI.h>
-#include <avr/wdt.h>
+//#include <avr/wdt.h> // avr/wdt is'nt going to work on STM32F103... It has a WDT, but it's not an AVR...
 #include <UIPEthernet.h>
 #include <PubSubClient.h>
 #include <MFRC522.h>
@@ -57,10 +57,11 @@ unsigned long lastActivate = 0;
 EthernetClient ethClient;
 PubSubClient mqttclient(server, 1883, mqtt_callback, ethClient);
 
+/* // No AVR/WDT
 ISR(WDT_vect) {
   //
 }
-
+*/
 int freeRam () {
   //https://playground.arduino.cc/Code/AvailableMemory
   extern int __heap_start, *__brkval;
@@ -138,10 +139,11 @@ void setup() {
   mfrc522.PCD_WriteRegister(mfrc522.ComIEnReg, 0xA0);
 
   // Activate the interrupt
-  attachInterrupt(digitalPinToInterrupt(IRQ_PIN), irq_callback, FALLING);
+  //attachInterrupt(digitalPinToInterrupt(IRQ_PIN), irq_callback, FALLING);
+  attachInterrupt(IRQ_PIN, irq_callback, FALLING); // No Idea if this is going to work, but digitalpintointerrupt doesn't exist for STM32F103, and all its pins are in theory interupt capable...
   delay(500);
   activateRec(mfrc522);
-  wdt_enable(WDTO_8S);
+  //wdt_enable(WDTO_8S); // Yeah, Should maybe figure out how Arduino handles WDT for STM32... But don't want to.
 }
 
 void reconnect() {
@@ -276,6 +278,6 @@ void loop() {
     }
   }
 
-  wdt_reset();
+//  wdt_reset(); // darn, another compile error because of that WDT
   delay(100);
 }

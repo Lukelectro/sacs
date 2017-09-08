@@ -1,15 +1,15 @@
 #ifndef __MAIN_H_INCLUDED__   // if x.h hasn't been included yet...
 #define __MAIN_H_INCLUDED__   //   #define this so the compiler knows it has been included
-#define SS_PIN 9//ENC28j60 is on 10
-#define RST_PIN 5
-#define IRQ_PIN 2
+#define SS_PIN PA1//ENC28j60 is on PA4 (STM32F103), RFID-RC522 on PA1
+#define RST_PIN PA9 // ENC on RST, RC522 on PA9
+#define IRQ_PIN 2 // maybe unused?
 #ifndef DOORPIN
 #define DOORPIN 3
 #endif
 #ifndef BLINKLED
-#define BLINKLED 4
+#define BLINKLED PC13 // PC13
 #endif
-#define RFIDREADLED 6
+#define RFIDREADLED 6 // not used?
 #define INTERVAL 300
 #ifndef NODE_PASSWD
 #define NODE_PASSWD "xxx"
