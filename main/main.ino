@@ -17,12 +17,24 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+// for test
+#define MACADDRESS 0x12, 0xBC, 0xA2, 0xF1, 0x06, 0x46 // lets try a non-default one (Random generated)
+#define MQTT_VERSION MQTT_VERSION_3_1_1
+#define MQTT_SOCKET_TIMEOUT 20
+#define MQTT_KEEPALIVE 14
+//#define IP 192,168,1,6
+#define SERVER 83,163,200,191 // space.makerspaceleiden.nl DNS resolves to this...
+
+
+
 #include <SPI.h>
 //#include <avr/wdt.h> // avr/wdt is'nt going to work on STM32F103... It has a WDT, but it's not an AVR...
 #include <UIPEthernet.h>
 #include <PubSubClient.h>
 #include <MFRC522.h>
 #include "main0.h"
+
+// If needed, change pubsubclient.h to MQTT version 3.1 instead of 3.1.1
 
 //them globals
 MFRC522 mfrc522(SS_PIN, RST_PIN);
@@ -103,6 +115,10 @@ void setup() {
   flags.opendoor = false;
 
   Serial.begin(9600);
+
+// for testing, to have time to open the terminal
+  delay(5000); // There must be a better way, like detecting when something connects...
+  
   Serial.println(F("\n\n" __FILE__ " " __DATE__ " " __TIME__));
   SPI.begin();
   mfrc522.PCD_Init();

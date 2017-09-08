@@ -2,7 +2,7 @@
 #define __MAIN_H_INCLUDED__   //   #define this so the compiler knows it has been included
 #define SS_PIN PA1//ENC28j60 is on PA4 (STM32F103), RFID-RC522 on PA1
 #define RST_PIN PA9 // ENC on RST, RC522 on PA9
-#define IRQ_PIN 2 // maybe unused?
+#define IRQ_PIN PA2 // maybe unused?
 #ifndef DOORPIN
 #define DOORPIN 3
 #endif
@@ -10,7 +10,7 @@
 #define BLINKLED PC13 // PC13
 #endif
 #define RFIDREADLED 6 // not used?
-#define INTERVAL 300
+#define INTERVAL 300 // what is this for? Was 300. Since I get timed out (RC=-4) at MQTT connection, trying 500.
 #ifndef NODE_PASSWD
 #define NODE_PASSWD "xxx"
 #endif
@@ -20,12 +20,13 @@
 #ifndef MACADDRESS
 #define MACADDRESS 0xDE, 0xED, 0xBA, 0xFD, 0xFD, 0xEC
 #endif
-#ifndef SERVER
 
+#ifndef SERVER
+#warn "geen serveradres!"
 #define SERVER 000,000,000,000
 #endif
-#ifndef IP
 
+#ifndef IP
 #define IP 000,000,000,000//spacetest
 #endif
 
