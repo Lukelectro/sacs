@@ -135,7 +135,15 @@ void setup() {
     Ethernet.begin(mac, ip);
     //for(;;);
   } else {
-    Serial.println(F("DHCP success..."));
+    Serial.print("DHCP success...\n IP:");
+    Serial.print(Ethernet.localIP());
+    Serial.print("\n Gateway:");
+    Serial.print(Ethernet.gatewayIP());
+    Serial.print("\n subnet:");
+    Serial.print(Ethernet.subnetMask());
+    Serial.print("\n DNS:");
+    Serial.print(Ethernet.dnsServerIP());
+    Serial.print("\n");  
   }
 
   //the interrupt stuff from
@@ -175,6 +183,16 @@ void reconnect() {
     Serial.println(F(" try again in 5 seconds"));
     // Wait 5 seconds before retrying
     delay(5000);
+    Ethernet.maintain();
+    Serial.print("Ethernet.maintain() called \n IP:");
+    Serial.print(Ethernet.localIP());
+    Serial.print("\n Gateway:");
+    Serial.print(Ethernet.gatewayIP());
+    Serial.print("\n subnet:");
+    Serial.print(Ethernet.subnetMask());
+    Serial.print("\n DNS:");
+    Serial.print(Ethernet.dnsServerIP());
+    Serial.print("\n");
     return;
   }
   Serial.println(F("connected"));
