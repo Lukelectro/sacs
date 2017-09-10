@@ -23,8 +23,8 @@
 #define MQTT_SOCKET_TIMEOUT 20
 #define MQTT_KEEPALIVE 14
 //#define IP 192,168,1,6
-#define SERVER 83,163,200,191 // space.makerspaceleiden.nl DNS resolves to this...
-
+//#define SERVER 83,163,200,191 // space.makerspaceleiden.nl DNS resolves to this...
+#define SERVER 192,168,4,2 // internal door DB / MQTT broker
 
 
 #include <SPI.h>
@@ -117,7 +117,7 @@ void setup() {
   Serial.begin(9600);
 
 // for testing, to have time to open the terminal
-  delay(5000); // There must be a better way, like detecting when something connects...
+  delay(10000); // There must be a better way, like detecting when something connects...
   
   Serial.println(F("\n\n" __FILE__ " " __DATE__ " " __TIME__));
   SPI.begin();
