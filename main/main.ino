@@ -22,6 +22,9 @@
 #include <UIPEthernet.h>
 #include <PubSubClient.h>
 #include <MFRC522.h>
+
+#define SERVER 192,168,4,2 // 
+
 #include "main0.h"
 
 //them globals
