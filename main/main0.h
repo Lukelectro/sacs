@@ -32,10 +32,10 @@
 
 #define FORMAT "[%d, %d, %d, %d]"
 #ifndef INTOPIC
-#define INTOPIC "InPutTopic_TEST" 
+#define INTOPIC "deur/space_2/open" 
 #endif
 #ifndef OUTTOPIC
-#define OUTTOPIC "OutPutTopic_TEST"
+#define OUTTOPIC "deur/space_2/rfid"
 #endif
 #define DOOROPEN 5000
 #if DOOROPEN>8000
