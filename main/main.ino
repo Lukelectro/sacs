@@ -182,7 +182,7 @@ byte copy_to_mqtttag(byte *buffer, byte bufferSize) {
 void IRQ_invoked() {
   //digitalWrite(RFIDREADLED, HIGH);
 
-  if (mfrc522.PICC_ReadCardSerial() && mfrc522.uid.size) {
+  if (mfrc522.PICC_ReadCardSerial() && mfrc522.uid.size) { // NOTE: Is size checking here correct? Todo: test with various rfids.
     /* Show some details of the PICC// (that is: the tag/card)
       uidByte is a pointer to a buffer which is not always cleared
       despite a new trigger. This means, someone without access trying
