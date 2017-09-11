@@ -24,8 +24,8 @@
 #define MQTT_KEEPALIVE 14
 //#define IP 192,168,1,6
 //#define SERVER 83,163,200,191 // space.makerspaceleiden.nl DNS resolves to this...
-#define SERVER 192,168,4,2 // internal door DB / MQTT broker
-
+//#define SERVER 192,168,4,2 // internal door DB / MQTT broker
+#define SERVER 192,168,178,17 // Luke's Broker (Dynamic IP!)
 
 #include <SPI.h>
 //#include <avr/wdt.h> // avr/wdt is'nt going to work on STM32F103... It has a WDT, but it's not an AVR...
