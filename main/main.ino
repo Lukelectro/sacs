@@ -149,6 +149,7 @@ void setup() {
 
   pinMode(DOORPIN, OUTPUT);
   pinMode(ENPIN, OUTPUT);
+  digitalWrite(ENPIN, HIGH); // Enable is active low, disable stepper driver.
   pinMode(STEPPIN, OUTPUT);
   pinMode(DIRPIN, OUTPUT);
   digitalWrite(DIRPIN,INITIAL_DIR);
@@ -282,11 +283,14 @@ void loop() {
 
   mqttclient.loop();
 
+/*
   if (millis() - lastComMaintain > 120000) { // every 120 seconds
-    Ethernet.maintain();
+    UIPEthernet.maintain();
     Serial.println("Ethernet.Maintain() called");
     lastComMaintain = millis();
   }
+*/
+  UIPEthernet.maintain(); // documentation says you can call maintain as often as you want, and preferably every loop / more then once a second.
 
   //the interrupt triggered IRQ_invoked, subroutine decides
   if (flags.newgoodread) {
@@ -296,14 +300,18 @@ void loop() {
 
 
   if (flags.opendoor) {
-  static bool togglesteppin;
-  digitalWrite(STEPPIN,togglesteppin); // could maybe also use one of the PWM outputs...
-  togglesteppin!=togglesteppin; 
- 
+  static bool toggleStep;
+    //tone(STEPPIN,14000);
+    for(int pulsjes = 0; pulsjes < 1500; pulsjes++){ // because tone() doesn't work...  
+    digitalWrite(STEPPIN,toggleStep);
+    toggleStep=!toggleStep;
+    delay_us(70);
+    } // this does slow down the loop with about 100ms (1500*70us = 105 ms), so...
+    
     if (lastOpenStart == 0) {
 
       digitalWrite(DOORPIN, HIGH);
-      digitalWrite(ENPIN,HIGH);
+      digitalWrite(ENPIN,LOW);
       digitalWrite(DIRPIN,INITIAL_DIR);
       #if DEBUG==1
       Serial.println(F("door pin open"));
@@ -319,6 +327,8 @@ void loop() {
     }
     if (millis() - lastOpenStart > DOOROPEN) {
       digitalWrite(DOORPIN, LOW);
+      digitalWrite(ENPIN,HIGH);
+      //noTone(STEPPIN);
       #if DEBUG==1
       Serial.println(F("door pin close"));
       #endif
@@ -327,8 +337,10 @@ void loop() {
       buzzer = 0;
       lastOpenStart = 0;
     }
-  }
+  } else {delay(100); } // the delay marked 42_42_42 was put here to make the stepper run smoother and still delay the loop when it's not running. There probably is a better way to pulse "STEPPIN".
 
-//  wdt_reset(); // darn, another compile error because of that WDT
-  delay(100);
+#if defined(YESENABLETHEAVRWDT)
+ wdt_reset(); // darn, another compile error because of that WDT
+#endif
+//delay(100); // 42_42_42
 }

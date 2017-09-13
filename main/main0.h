@@ -1,10 +1,28 @@
 #ifndef __MAIN_H_INCLUDED__   // if x.h hasn't been included yet...
 #define __MAIN_H_INCLUDED__   //   #define this so the compiler knows it has been included
+
+
+#define DOOROPEN 10000
+
+// The #defines that allow one to determine which board is selected are in board.txt as build.board. Prepend with "ARDUINO_"
+#if defined(ARDUINO_AVR_NANO) || defined(ARDUINO_AVR_PRO)
+//AVR specific stuff, like e.g. pin defenitions, here.
+#if DOOROPEN>8000
+#error "door open too long, WDT problem"
+#endif
+#define YESENABLETHEAVRWDT
+#elif defined(ARDUINO_GENERIC_STM32F103C)
+//STM32F103 pindefs etc. here
+#else
+#error "possibly unsupported hardware, use STM32F103C or Arduino Nano, or if you dare, modify main0.h"
+#endif
+
+
 #define SS_PIN PA1//ENC28j60 is on PA4 (STM32F103), RFID-RC522 on PA1
 #define RST_PIN PA9 // ENC on RST, RC522 on PA9
 #define IRQ_PIN PA2 // maybe unused?
 #ifndef DOORPIN
-#define DOORPIN PB7
+#define DOORPIN PB8
 #endif
 #ifndef ENPIN
 #define ENPIN PB7
@@ -52,10 +70,8 @@
 #ifndef OUTTOPIC
 #define OUTTOPIC "deur/space_2/rfid"
 #endif
-#define DOOROPEN 5000
-#if DOOROPEN>8000
-#error "door open too long, WDT problem"
-#endif
+
+
 //mqtt props
 #define QOS 0//quality of service mqtt
 #define RETAIN 0//
