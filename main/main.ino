@@ -46,7 +46,7 @@ struct Flags
   bool newgoodread;
   bool doread;
   bool opendoor;
-};
+}flags;
 
 const byte ip[4] = { IP };
 const uint8_t mac[6] = { MACADDRESS };
@@ -57,14 +57,13 @@ const int retain = RETAIN;
 
 //have to think about the best strategy for the qos and retain...
 
-Flags flags;
 bool toggleled = false;
 bool toggledoor = false;
-long previousMillis;
 char mqttstring[20];
 byte buzzer = 0;
 unsigned long lastOpenStart = 0;
 unsigned long lastActivate = 0;
+unsigned long lastComMaintain = 0;
 
 EthernetClient ethClient;
 PubSubClient mqttclient(server, 1883, mqtt_callback, ethClient);
@@ -116,9 +115,8 @@ void setup() {
 
   Serial.begin(9600);
 
-// for testing, to have time to open the terminal
-  delay(10000); // There must be a better way, like detecting when something connects...
-  
+  delay(10000); // stupid workaround for serial problem
+
   Serial.println(F("\n\n" __FILE__ " " __DATE__ " " __TIME__));
   SPI.begin();
   mfrc522.PCD_Init();
@@ -150,6 +148,10 @@ void setup() {
   //https://github.com/miguelbalboa/rfid/blob/master/examples/MinimalInterrupt/MinimalInterrupt.ino
 
   pinMode(DOORPIN, OUTPUT);
+  pinMode(ENPIN, OUTPUT);
+  pinMode(STEPPIN, OUTPUT);
+  pinMode(DIRPIN, OUTPUT);
+  digitalWrite(DIRPIN,INITIAL_DIR);
   pinMode(BLINKLED, OUTPUT);
   pinMode(RFIDREADLED, OUTPUT);
   pinMode(IRQ_PIN, INPUT_PULLUP);
@@ -280,6 +282,12 @@ void loop() {
 
   mqttclient.loop();
 
+  if (millis() - lastComMaintain > 120000) { // every 120 seconds
+    Ethernet.maintain();
+    Serial.println("Ethernet.Maintain() called");
+    lastComMaintain = millis();
+  }
+
   //the interrupt triggered IRQ_invoked, subroutine decides
   if (flags.newgoodread) {
     mqttclient.publish(OUTTOPIC , mqttstring, retain);
@@ -288,9 +296,15 @@ void loop() {
 
 
   if (flags.opendoor) {
+  static bool togglesteppin;
+  digitalWrite(STEPPIN,togglesteppin); // could maybe also use one of the PWM outputs...
+  togglesteppin!=togglesteppin; 
+ 
     if (lastOpenStart == 0) {
 
       digitalWrite(DOORPIN, HIGH);
+      digitalWrite(ENPIN,HIGH);
+      digitalWrite(DIRPIN,INITIAL_DIR);
       #if DEBUG==1
       Serial.println(F("door pin open"));
       #endif
@@ -300,6 +314,9 @@ void loop() {
       //Serial.println();
       //if (!lastOpenStart) lastOpenStart++;
     };
+    if (millis() - lastOpenStart > 0.5*DOOROPEN) {
+    digitalWrite(DIRPIN,!INITIAL_DIR);
+    }
     if (millis() - lastOpenStart > DOOROPEN) {
       digitalWrite(DOORPIN, LOW);
       #if DEBUG==1

@@ -4,12 +4,27 @@
 #define RST_PIN PA9 // ENC on RST, RC522 on PA9
 #define IRQ_PIN PA2 // maybe unused?
 #ifndef DOORPIN
-#define DOORPIN 3
+#define DOORPIN PB7
+#endif
+#ifndef ENPIN
+#define ENPIN PB7
+#endif
+#ifndef STEPPIN
+#define STEPPIN PB5
+#endif
+#ifndef DIRPIN
+#define DIRPIN PB6
+#endif
+#ifndef INITIAL_DIR
+#define INITIAL_DIR 1 // what direction does stepper go first on Open?
+#endif
+#if INITIAL_DIR > 1 || INITIAL_DIR < 0
+#error "INITIAL_DIR must be boolean"
 #endif
 #ifndef BLINKLED
 #define BLINKLED PC13 // PC13
 #endif
-#define RFIDREADLED 6 // not used?
+#define RFIDREADLED PB4 // not used?
 #define INTERVAL 300 // what is this for? Was 300. Since I get timed out (RC=-4) at MQTT connection, trying 500.
 #ifndef NODE_PASSWD
 #define NODE_PASSWD "xxx"
@@ -22,7 +37,7 @@
 #endif
 
 #ifndef SERVER
-#warn "geen serveradres!"
+#error "geen serveradres!"
 #define SERVER 000,000,000,000
 #endif
 
@@ -32,10 +47,10 @@
 
 #define FORMAT "[%d, %d, %d, %d]"
 #ifndef INTOPIC
-#define INTOPIC "InPutTopic_TEST" 
+#define INTOPIC "deur/space_2/open" 
 #endif
 #ifndef OUTTOPIC
-#define OUTTOPIC "OutPutTopic_TEST"
+#define OUTTOPIC "deur/space_2/rfid"
 #endif
 #define DOOROPEN 5000
 #if DOOROPEN>8000
