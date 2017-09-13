@@ -10,26 +10,29 @@
 #if DOOROPEN>8000
 #error "door open too long, WDT problem"
 #endif
-// These pindefs are wrong for AVR and need to be corrected
-#define SS_PIN PA1//ENC28j60 is on PA4 (STM32F103), RFID-RC522 on PA1
-#define RST_PIN PA9 // ENC on RST, RC522 on PA9
-#define IRQ_PIN PA2 
+
+#define SS_PIN 9//ENC28j60 is on 10
+#define RST_PIN 5 // ENC on RST, RC522 on PA9
+#define IRQ_PIN 2 
 #ifndef DOORPIN
-#define DOORPIN PB8
-#endif
-#ifndef ENPIN
-#define ENPIN PB7
-#endif
-#ifndef STEPPIN
-#define STEPPIN PB5
-#endif
-#ifndef DIRPIN
-#define DIRPIN PB6
+#define DOORPIN 3
 #endif
 #ifndef BLINKLED
-#define BLINKLED PC13 // PC13
+#define BLINKLED 4 
 #endif
-#define RFIDREADLED PB4 // not used?
+#define RFIDREADLED 6 
+
+#ifndef ENPIN
+#define ENPIN -1
+#endif
+#ifndef STEPPIN
+#define STEPPIN -1
+#endif
+#ifndef DIRPIN
+#define DIRPIN -1
+#endif
+
+
 #define YESENABLETHEAVRWDT
 
 #elif defined(ARDUINO_GENERIC_STM32F103C)
